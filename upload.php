@@ -3,15 +3,28 @@ include 'functions.php';
 include 'autoload.php';
 if($_SERVER["REQUEST_METHOD"] == "POST"){
 
+    if(isset($_FILES['file'])){
+
     $file = $_FILES['file'];
-    $tags = "wichtig info";
+    $tags = "";
+
+    if(isset($_POST["wichtig"])){
+        if($_POST["wichtig"] == "on")$tags = $tags . "wichtig ";
+    }
+    if(isset($_POST["info"])){
+        if($_POST["info"] == "on")$tags = $tags . "info ";
+    }
+    if(isset($_POST["nachweis"])){
+        if($_POST["nachweis"] == "on")$tags = $tags . "nachweis ";
+    }
+
     uploadFile($file, $tags);  
     
-    header("Location: /");
-    
-
 }
 
+header("Location: /");
+
+}
 
 ?>
 
@@ -27,7 +40,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
 <form action="#" method="post" enctype="multipart/form-data">
 
-<input type="file" name="file">
+<p>
+    <input type="file" name="file" required>
+</p>
+<p>
+    <input type="checkbox" name="wichtig" value="on">Wichtig
+    <input type="checkbox" name="info" value="on">Info
+    <input type="checkbox" name="nachweis" value="on">Nachweis
+</p>
 <input type="submit" value="Los">
 
 </form>
