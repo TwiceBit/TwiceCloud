@@ -49,7 +49,7 @@ include 'autoload.php'
 
     <tr class="<?php printCSSTags($file) ?>">
         <td> <a href="/download.php?id=<?php echo $file[0]; ?>">  <span><?php printFileName($file) ?> </span> </a></td>
-        <td><?php printFileTags($file) ?></td>
+        <td><?php printFileTags($file) ?> <a href="edit.php?id=<?php echo $file[0]; ?>"> Bearbeiten </a> </td>
     </tr>
 <?php 
     }

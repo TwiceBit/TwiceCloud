@@ -1,5 +1,5 @@
 <?php
-include 'autoload.php';
+include 'Config.php';
 class Database {
 
 
@@ -17,7 +17,7 @@ static function ConntectToServer(){
     
     Database::init();
     
-        mkdir(Config::$dirName);
+        if(!file_exists(Config::$dirName)) mkdir(Config::$dirName);
     
     
 }
@@ -32,7 +32,7 @@ static function runSqlCommand($sql){
     return Database::$connection->query($sql);
 }
 
-static function runPreparedCommand($sql, $file){
+static function runPreparedCommand($sql, $file, $path, $tags){
     if(Database::$connection == null){
        
         Database::ConntectToServer();
@@ -47,8 +47,10 @@ static function runPreparedCommand($sql, $file){
         print(mysqli_error(Database::$connection));
     }
     
-    $prepared->bind_param('s',$uploadFile);
-    $uploadFile = "". $file;
+    $prepared->bind_param('sss',$fileName, $filePath, $fileTags);
+    $fileName = $file;
+    $filePath = $path;
+    $fileTags = $tags;
     $prepared->execute(); 
     $prepared->close();
     

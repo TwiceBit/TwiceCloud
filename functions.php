@@ -1,7 +1,7 @@
 <?php
 
 require 'Database.php';
-require 'autoload.php';
+
 function fetchAllFiles() {
 
     if(Database::$connection == null){
@@ -48,14 +48,14 @@ function getFile($id){
 
 function downloadFile($id){
     if(Database::$connection == null) Database::ConntectToServer();
-    $prep = Database::$connection->prepare("SELECT file FROM Files where id = ?");
+    $prep = Database::$connection->prepare("SELECT filename,file  FROM Files where id = ?");
     if(!$prep) echo mysqli_error(Database::$connection);
     $prep->bind_param('i', $target);
     $target = $id;
     $prep->execute();
     $res = $prep->get_result()->fetch_array();
     $prep->close();
-    return $res[0];
+    return $res[1] . "/" . $res[0];
 }
 
 function uploadFile($formfile, $tags){
@@ -63,11 +63,11 @@ function uploadFile($formfile, $tags){
     
     $uuid = "." . uniqid() . uniqid() .  uniqid();
     $path = Config::$dirName . "/" . $uuid;
-    $name = $formfile['name'];
+    $name = htmlspecialchars($formfile['name']);
     if(mkdir($path)){
         move_uploaded_file($formfile['tmp_name'], "$path/$name");
-        $sql = "INSERT INTO Files (filename, file, tags) VALUES (\"$name\", ?, \"$tags\")";
-        Database::runpreparedCommand($sql, "$path/$name");
+        $sql = "INSERT INTO Files (filename, file, tags) VALUES (?, ?, ?)";
+        Database::runpreparedCommand($sql, $name, $uuid, $tags);
     }
     
 }
@@ -105,6 +105,65 @@ function printCSSTags($file){
         }
     
 }
+
+
+function getFilebyId($id){
+
+    if(Database::$connection == null){
+        
+        Database::ConntectToServer();
+        
+    }
+
+
+    $prepared = Database::$connection->prepare("SELECT * FROM Files WHERE id=?");
+    if(!$prepared){
+        echo "Error";
+    }
+
+    $prepared->bind_param("i", $file);
+    $file = $id;
+    $prepared->execute();
+
+    $res = $prepared->get_result();
+
+
+    return $res->fetch_assoc();
+
+
+}
+
+function updateFileById($id, $name, $tags){
+
+    if(Database::$connection == null){
+        Database::ConntectToServer();
+    }
+
+    $file = getFilebyId($id);
+    $path = Config::$dirName . "/" . $file["file"] . "/";
+
+
+    $prepared = Database::$connection->prepare("UPDATE Files set filename=?, tags=? WHERE id=?");
+    if(!$prepared){
+        return null;
+    }
+
+    $prepared->bind_param("ssi", $filename, $filetags, $fileid);
+    $fileid = $id;
+    $filename = $name;
+    $filetags = $tags;
+    $prepared->execute();
+    $prepared->close();
+
+    
+    if($file["file"] !== $name){
+        copy($path . $file["filename"], $path . $name);
+        unlink($path . $file["filename"]);
+    }
+    
+}
+
+
 
 ?>
 
