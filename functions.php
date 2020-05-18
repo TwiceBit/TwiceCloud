@@ -133,6 +133,32 @@ function getFilebyId($id){
 
 }
 
+function deleteFile($id){
+
+
+    $target = getFilebyId($id);
+
+    if(Database::$connection == null){
+        
+        Database::ConntectToServer();
+        
+    }
+
+    
+    $prepared = Database::$connection->prepare("DELETE FROM Files WHERE id=?");
+    if(!$prepared){
+        echo "Error";
+    }
+
+    $prepared->bind_param("i", $file);
+    $file = $id;
+    $prepared->execute();
+
+    unlink(Config::$dirName . "/" . $target["file"] . "/" . $target["filename"]);
+    rmdir(Config::$dirName . "/" . $target['file']);
+}
+
+
 function updateFileById($id, $name, $tags){
 
     if(Database::$connection == null){

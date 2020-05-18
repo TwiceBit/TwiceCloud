@@ -47,6 +47,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
 </form>
 
+<form action="delete.php" method="post">
+    <input type="hidden" name="id" value="<?php echo $_GET['id']; ?>">
+    <input type="submit" value="L&ouml;schen">
+</form>
 
 </body>
 </html>
