@@ -39,7 +39,7 @@ function printFileTags($file){
 }
 
 function printFileName($file){
-    echo $file[1];
+    echo htmlspecialchars($file[1]);
 }
 
 function getFile($id){
@@ -60,7 +60,8 @@ function downloadFile($id){
 
 function uploadFile($formfile, $tags){
     Database::init();
-    
+    if(strpos($formfile['name'], "..")) return;
+    if(strpos($name, "<")) return;
     $uuid = "." . uniqid() . uniqid() .  uniqid();
     $path = Config::$dirName . "/" . $uuid;
     $name = htmlspecialchars($formfile['name']);
@@ -164,6 +165,9 @@ function updateFileById($id, $name, $tags){
     if(Database::$connection == null){
         Database::ConntectToServer();
     }
+
+    if(strpos($name, "..")) return;
+    if(strpos($name, "<")) return;
 
     $file = getFilebyId($id);
     $path = Config::$dirName . "/" . $file["file"] . "/";
